@@ -1,5 +1,6 @@
 import { Camera, Film, Video, RefreshCw, ArrowLeft, Check } from 'lucide-react';
 import { SessionType } from '../../types';
+import { soundSynth } from '../../utils/soundSynthesizer';
 
 interface Props {
   onSelect: (type: SessionType) => void;
@@ -77,7 +78,7 @@ export default function ModeSelect({ onSelect, onBack }: Props) {
       <div className="sticky top-0 z-20 flex items-center justify-between px-8 py-4 glass-dark">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors font-semibold"
         >
           <ArrowLeft size={20} />
           <span className="text-sm">Kembali</span>
@@ -112,58 +113,68 @@ export default function ModeSelect({ onSelect, onBack }: Props) {
             return (
               <button
                 key={mode.type}
-                onClick={() => onSelect(mode.type)}
-                className="kiosk-btn relative rounded-2xl p-6 text-left group"
+                onClick={() => {
+                  soundSynth.beep(800, 150);
+                  onSelect(mode.type);
+                }}
+                className="kiosk-btn relative rounded-2xl p-6 text-left group transition-all hover:scale-105 active:scale-95"
                 style={{
                   background: mode.bg,
-                  border: `1px solid ${mode.border}`,
+                  border: `2px solid ${mode.border}`,
                   animationDelay: `${idx * 0.1}s`,
                   animation: 'fadeInUp 0.5s ease forwards',
                   opacity: 0,
+                  boxShadow: 'hover' ? `0 0 30px ${mode.bg}` : 'none',
                 }}
               >
                 {/* Icon */}
                 <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110"
+                  className="w-16 h-16 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-125 group-hover:rotate-3"
                   style={{
                     background: `${mode.bg}`,
-                    border: `1px solid ${mode.border}`,
-                    boxShadow: `0 0 20px ${mode.bg}`,
+                    border: `1.5px solid ${mode.border}`,
+                    boxShadow: `0 0 25px ${mode.bg}`,
                   }}
                 >
-                  <Icon size={26} style={{ color: mode.color }} />
+                  <Icon size={28} style={{ color: mode.color }} />
                 </div>
 
                 {/* Labels */}
                 <div className="flex items-baseline gap-2 mb-1">
-                  <span className="text-2xl font-bold text-white">{mode.label}</span>
+                  <span className="text-2xl font-black text-white">{mode.label}</span>
                   <span
-                    className="text-xs font-semibold tracking-widest uppercase"
-                    style={{ color: mode.color }}
+                    className="text-xs font-black tracking-widest uppercase"
+                    style={{ color: mode.color, textShadow: `0 0 10px ${mode.bg}` }}
                   >
                     {mode.sublabel}
                   </span>
                 </div>
 
-                <p className="text-gray-400 text-sm mb-5 leading-relaxed">{mode.desc}</p>
+                <p className="text-gray-300 text-sm mb-5 leading-relaxed font-medium">{mode.desc}</p>
 
                 {/* Features */}
-                <ul className="space-y-1.5 mb-5">
+                <ul className="space-y-2 mb-5">
                   {mode.features.map((f) => (
-                    <li key={f} className="flex items-center gap-2 text-gray-300 text-sm">
-                      <Check size={13} style={{ color: mode.color }} />
+                    <li key={f} className="flex items-center gap-2 text-gray-200 text-sm font-medium">
+                      <Check size={14} style={{ color: mode.color }} className="flex-shrink-0" />
                       {f}
                     </li>
                   ))}
                 </ul>
 
-                {/* Price */}
+                {/* Price with glow */}
                 <div
-                  className="flex items-center justify-between pt-4"
+                  className="flex items-center justify-between pt-5"
                   style={{ borderTop: `1px solid ${mode.border}` }}
                 >
-                  <span className="text-gray-500 text-xs uppercase tracking-wide">Harga</span>
-                  <span className="text-lg font-bold" style={{ color: mode.color }}>
+                  <span className="text-gray-500 text-xs uppercase tracking-widest font-bold">Harga</span>
+                  <span
+                    className="text-xl font-black"
+                    style={{
+                      color: mode.color,
+                      textShadow: `0 0 15px ${mode.bg}`,
+                    }}
+                  >
                     {formatRupiah(mode.price)}
                   </span>
                 </div>
@@ -173,7 +184,7 @@ export default function ModeSelect({ onSelect, onBack }: Props) {
                   className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
                   style={{
                     background: `radial-gradient(ellipse at center, ${mode.bg} 0%, transparent 70%)`,
-                    boxShadow: `0 0 40px ${mode.bg}`,
+                    boxShadow: `0 0 50px ${mode.bg}`,
                   }}
                 />
               </button>
