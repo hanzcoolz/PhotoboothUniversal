@@ -1,4 +1,5 @@
 import { Camera, Sparkles, Star, Zap } from 'lucide-react';
+import AutoSlider from './AutoSlider';
 
 interface Props {
   onStart: () => void;
@@ -7,8 +8,7 @@ interface Props {
 export default function AttractScreen({ onStart }: Props) {
   return (
     <div
-      className="relative w-full h-screen overflow-hidden cursor-pointer select-none"
-      onClick={onStart}
+      className="relative w-full h-screen overflow-auto"
       style={{
         background: 'radial-gradient(ellipse at 50% 0%, #1a0e00 0%, #0a0a0a 60%)',
       }}
@@ -38,10 +38,10 @@ export default function AttractScreen({ onStart }: Props) {
         style={{ background: 'linear-gradient(90deg, transparent, #D4A844, transparent)' }}
       />
 
-      {/* Center content */}
-      <div className="flex flex-col items-center justify-center h-full relative z-10 px-8 text-center">
+      {/* Center content - scrollable */}
+      <div className="relative z-10 px-8 pt-12 pb-8">
         {/* Logo / Icon cluster */}
-        <div className="relative mb-10 animate-float">
+        <div className="flex flex-col items-center justify-center mb-10 animate-float">
           <div
             className="w-32 h-32 rounded-full flex items-center justify-center gold-glow"
             style={{
@@ -73,7 +73,7 @@ export default function AttractScreen({ onStart }: Props) {
 
         {/* Main title */}
         <h1
-          className="font-bold mb-2 leading-none tracking-tight"
+          className="font-bold mb-2 leading-none tracking-tight text-center"
           style={{
             fontFamily: 'Playfair Display, serif',
             fontSize: 'clamp(3rem, 8vw, 7rem)',
@@ -86,14 +86,14 @@ export default function AttractScreen({ onStart }: Props) {
 
         {/* Tagline */}
         <p
-          className="text-gray-400 font-light tracking-widest uppercase text-sm md:text-base mb-14"
+          className="text-gray-400 font-light tracking-widest uppercase text-sm md:text-base mb-14 text-center"
           style={{ letterSpacing: '0.25em' }}
         >
           Capture Your Perfect Moment
         </p>
 
         {/* CTA Button */}
-        <div className="relative">
+        <div className="flex justify-center relative mb-12">
           <button
             className="kiosk-btn relative px-14 py-5 rounded-full text-black font-bold text-xl tracking-wide"
             style={{
@@ -118,9 +118,18 @@ export default function AttractScreen({ onStart }: Props) {
         </div>
 
         {/* Tap hint */}
-        <p className="mt-10 text-gray-600 text-sm tracking-widest uppercase">
+        <p className="mt-4 text-gray-600 text-sm tracking-widest uppercase text-center">
           Sentuh layar untuk mulai
         </p>
+
+        {/* Auto-sliding gallery */}
+        <div className="mt-16 max-w-6xl mx-auto">
+          <div className="text-center mb-4">
+            <p className="text-gray-400 text-xs uppercase tracking-widest">GALERI TERBARU</p>
+            <h2 className="text-white font-bold text-lg mt-1">Hasil Foto Guest Terbaru</h2>
+          </div>
+          <AutoSlider />
+        </div>
       </div>
 
       {/* Bottom info bar */}
@@ -133,7 +142,7 @@ export default function AttractScreen({ onStart }: Props) {
           className="text-xs font-light tracking-widest"
           style={{ color: 'rgba(212,168,68,0.6)' }}
         >
-          PHOTOBOOTH v1.0
+          PHOTOBOOTH v2.0 PREMIUM
         </span>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />

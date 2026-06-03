@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowLeft, RefreshCw, CheckCircle, Clock, AlertCircle, QrCode, Smartphone, Wifi } from 'lucide-react';
 import { SessionType } from '../../types';
+import { soundSynth } from '../../utils/soundSynthesizer';
 
 interface Props {
   sessionType: SessionType;
@@ -43,7 +44,11 @@ export default function PaymentScreen({ sessionType, onPaid, onBack }: Props) {
 
   useEffect(() => {
     if (payState === 'generating') {
-      const t = setTimeout(() => setPayState('waiting'), 1800);
+      soundSynth.processingSound();
+      const t = setTimeout(() => {
+        setPayState('waiting');
+        soundSynth.beep(800, 150);
+      }, 1800);
       return () => clearTimeout(t);
     }
   }, [payState]);
@@ -70,8 +75,12 @@ export default function PaymentScreen({ sessionType, onPaid, onBack }: Props) {
 
   // Demo: simulate payment
   const simulatePaid = () => {
+    soundSynth.countdownBeep();
     setPayState('paid');
-    setTimeout(onPaid, 2000);
+    setTimeout(() => {
+      soundSynth.successChime();
+      onPaid();
+    }, 1500);
   };
 
   return (

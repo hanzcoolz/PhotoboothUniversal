@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Camera, ZoomIn, Aperture, Timer } from 'lucide-react';
 import { SessionType } from '../../types';
+import { soundSynth } from '../../utils/soundSynthesizer';
 
 interface Props {
   sessionType: SessionType;
@@ -42,6 +43,7 @@ export default function CaptureScreen({ sessionType, onComplete }: Props) {
   const [flashOpacity, setFlashOpacity] = useState(0);
 
   const startCountdown = useCallback(() => {
+    soundSynth.countdownBeep();
     setCaptureState('countdown');
     setCountdown(3);
   }, []);
@@ -49,7 +51,8 @@ export default function CaptureScreen({ sessionType, onComplete }: Props) {
   useEffect(() => {
     if (captureState !== 'countdown') return;
     if (countdown <= 0) {
-      // Trigger capture
+      // Trigger capture with sound
+      soundSynth.shutter();
       setCaptureState('flash');
       setFlashOpacity(1);
       setTimeout(() => {
@@ -57,19 +60,25 @@ export default function CaptureScreen({ sessionType, onComplete }: Props) {
         const newFrames = [...capturedFrames, MOCK_FRAMES[currentFrame % MOCK_FRAMES.length]];
         setCapturedFrames(newFrames);
         setCaptureState('captured');
+        soundSynth.beep(1200, 100);
         setTimeout(() => {
           if (currentFrame + 1 >= totalFrames) {
             setCaptureState('done');
+            soundSynth.successChime();
             setTimeout(() => onComplete(newFrames), 800);
           } else {
             setCurrentFrame((p) => p + 1);
             setCaptureState('preview');
+            soundSynth.beep(600, 80);
           }
         }, 1200);
       }, 200);
       return;
     }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    const t = setTimeout(() => {
+      setCountdown((c) => c - 1);
+      if (countdown > 1) soundSynth.countdownBeep();
+    }, 1000);
     return () => clearTimeout(t);
   }, [captureState, countdown, capturedFrames, currentFrame, totalFrames, onComplete]);
 

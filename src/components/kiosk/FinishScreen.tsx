@@ -1,5 +1,8 @@
-import { useState } from 'react';
-import { Printer, MessageCircle, Download, QrCode, Share2, Home, CheckCircle, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Printer, MessageCircle, Download, QrCode, Share2, Home, CheckCircle, Mail, Wand2 } from 'lucide-react';
+import AIMagicStudio from './AIMagicStudio';
+import FrameLayoutSelector from './FrameLayoutSelector';
+import { soundSynth } from '../../utils/soundSynthesizer';
 
 interface Props {
   frames: string[];
@@ -12,14 +15,27 @@ export default function FinishScreen({ frames, onHome }: Props) {
   const [printState, setPrintState] = useState<ShareState>('idle');
   const [showWaModal, setShowWaModal] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
+  const [showAI, setShowAI] = useState(false);
   const [phone, setPhone] = useState('');
 
+  // Play success sound on mount
+  useEffect(() => {
+    soundSynth.successChime();
+  }, []);
+
   const handlePrint = () => {
+    soundSynth.processingSound();
     setPrintState('printing');
-    setTimeout(() => setPrintState('printed'), 3000);
+    setTimeout(() => {
+      setPrintState('printed');
+      soundSynth.successChime();
+    }, 3000);
   };
 
-  const handleWa = () => setShowWaModal(true);
+  const handleWa = () => {
+    soundSynth.beep(600, 150);
+    setShowWaModal(true);
+  };
 
   // Use the first frame as the "processed" result, or a fallback
   const resultImg =
@@ -94,7 +110,11 @@ export default function FinishScreen({ frames, onHome }: Props) {
               className="flex gap-2 justify-center"
               style={{ padding: '0 8px' }}
             >
-              {(frames.length > 0 ? frames : [resultImg, resultImg, resultImg]).map((f, i) => (
+              {(frames.length > 0 ? frames : [
+                'https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg?auto=compress&cs=tinysrgb&w=400',
+                'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400',
+                'https://images.pexels.com/photos/1395964/pexels-photo-1395964.jpeg?auto=compress&cs=tinysrgb&w=400',
+              ]).map((f, i) => (
                 <div
                   key={i}
                   className="rounded-lg overflow-hidden flex-1"
@@ -120,6 +140,13 @@ export default function FinishScreen({ frames, onHome }: Props) {
             </div>
           </div>
         </div>
+
+        {/* AI Magic Studio */}
+        {showAI && (
+          <div className="mb-6">
+            <AIMagicStudio />
+          </div>
+        )}
 
         {/* Action buttons */}
         <div className="grid grid-cols-2 gap-4 mb-6">
@@ -172,9 +199,31 @@ export default function FinishScreen({ frames, onHome }: Props) {
             </div>
           </button>
 
+          {/* AI Magic */}
+          <button
+            onClick={() => {
+              soundSynth.beep(800, 100);
+              setShowAI(!showAI);
+            }}
+            className="kiosk-btn flex flex-col items-center gap-3 p-5 rounded-2xl"
+            style={{
+              background: 'rgba(168,85,247,0.08)',
+              border: '1px solid rgba(168,85,247,0.3)',
+            }}
+          >
+            <Wand2 size={36} className="text-purple-400" />
+            <div>
+              <p className="text-white font-semibold text-base">AI Magic</p>
+              <p className="text-gray-500 text-xs mt-0.5">Edit dengan AI</p>
+            </div>
+          </button>
+
           {/* QR Download */}
           <button
-            onClick={() => setShowQrModal(true)}
+            onClick={() => {
+              soundSynth.beep(600, 100);
+              setShowQrModal(true);
+            }}
             className="kiosk-btn flex flex-col items-center gap-3 p-5 rounded-2xl"
             style={{
               background: 'rgba(56,189,248,0.08)',
@@ -185,21 +234,6 @@ export default function FinishScreen({ frames, onHome }: Props) {
             <div>
               <p className="text-white font-semibold text-base">QR Download</p>
               <p className="text-gray-500 text-xs mt-0.5">Scan & unduh</p>
-            </div>
-          </button>
-
-          {/* Email */}
-          <button
-            className="kiosk-btn flex flex-col items-center gap-3 p-5 rounded-2xl opacity-60"
-            style={{
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,255,255,0.08)',
-            }}
-          >
-            <Mail size={36} className="text-gray-400" />
-            <div>
-              <p className="text-white font-semibold text-base">Email</p>
-              <p className="text-gray-500 text-xs mt-0.5">Opsional</p>
             </div>
           </button>
         </div>
@@ -219,7 +253,10 @@ export default function FinishScreen({ frames, onHome }: Props) {
 
         {/* Home button */}
         <button
-          onClick={onHome}
+          onClick={() => {
+            soundSynth.beep(400, 200);
+            onHome();
+          }}
           className="kiosk-btn w-full flex items-center justify-center gap-3 py-4 rounded-2xl font-bold text-base"
           style={{
             background: 'linear-gradient(135deg, #D4A844, #F0C96A)',
@@ -230,6 +267,8 @@ export default function FinishScreen({ frames, onHome }: Props) {
           Selesai & Kembali ke Awal
         </button>
       </div>
+
+      {/* Modals... (rest unchanged) */}
 
       {/* WhatsApp modal */}
       {showWaModal && (
@@ -258,7 +297,10 @@ export default function FinishScreen({ frames, onHome }: Props) {
               }}
             />
             <button
-              onClick={() => setShowWaModal(false)}
+              onClick={() => {
+                soundSynth.successChime();
+                setShowWaModal(false);
+              }}
               className="kiosk-btn w-full py-3 rounded-xl font-bold text-black"
               style={{ background: 'linear-gradient(135deg, #25D366, #128C7E)' }}
             >
@@ -304,7 +346,10 @@ export default function FinishScreen({ frames, onHome }: Props) {
             </div>
             <p className="text-sky-400 text-xs mb-4">drive.google.com/file/d/mock-id</p>
             <button
-              onClick={() => setShowQrModal(false)}
+              onClick={() => {
+                soundSynth.beep(400, 100);
+                setShowQrModal(false);
+              }}
               className="text-gray-400 text-sm underline"
             >
               Tutup
